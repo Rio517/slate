@@ -122,6 +122,24 @@
 
 <p>Welcome to the <a href="http://www.controlshiftlabs.com/">ControlShift Labs</a> JSON API and Webhook Endpoint documentation!  Our API and Webhooks are designed to allow software engineers to create rich integrations between ControlShift content and third-party services and websites.</p>
 
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>&lt;% data.webhooks.each do</td>
+<td>webhook</td>
+</tr>
+<tr>
+<td><a href="#&lt;%= webhook.webhook %">&lt;%= webhook.webhook %&gt;</a></td>
+<td>&lt;%= webhook.description %&gt;</td>
+</tr>
+</tbody></table>
+
+<p>&lt;% end %&gt;</p>
+
           <h1 id="json-api-endpoints">JSON API Endpoints</h1>
 
 <p>The JSONP API is a simple way to embed ControlShift petition content in external sites. It&rsquo;s intended for use by a front-end developer embed content on web pages outside of the platform.  For example, a developer could:</p>
@@ -134,9 +152,9 @@
 <li>If a site visitor is logged in, show a users past actions and created petitions</li>
 </ul>
 
-<p>All of the endpoints can be consumed as jsonp instead of json by adding callback or variable parameters to the URLs.</p>
+<p>All of the endpoints can be consumed as JSONP instead of JSON by adding callback or variable parameters to the URLs.</p>
 
-<p>The URL slugs through the API are the same as those that are used through the web to represent specific petitions or categories.  Many front-end libraries including jQuery make it easy to consume jsonp endpoints. Our examples below use jQuery to consume these resources.</p>
+<p>The URL slugs through the API are the same as those that are used through the web to represent specific petitions or categories.  Many front-end libraries including jQuery make it easy to consume JSONP endpoints. Our examples below use jQuery to consume these resources.</p>
 
 <aside class="success">
 These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;ll need to replace this with the hostname of your instance.
@@ -156,7 +174,7 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
 </code></pre>
 
 <blockquote>
-<p>The above code would display your returned petition data in the console.  The JSON would be structured like this:</p>
+<p>The above code would display your returned petition data in the console.  The JSON response data would be structured like this:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">107370</span><span class="p">,</span><span class="w">
@@ -949,7 +967,7 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
 
 <p>Search for closest petition in an effort</p>
 
-<p>This JSON endpoint allows you to reproduce the &ldquo;search for the nearest petition in an effort&rdquo; interface. Use this endpoint to build a place for users to enter their location. Once they&rsquo;ve searched for a location, we&rsquo;ll return the nearest petition. This endpoint can most easily be used with a google maps integration to help your users locate their addresses or other points of interest. For an example, click on the working example below.</p>
+<p>This JSON endpoint allows you to reproduce the &ldquo;search for the nearest petition in an effort&rdquo; interface. Use this endpoint to build a place for users to enter their location. Once they&rsquo;ve searched for a location, we&rsquo;ll return the nearest petition. This endpoint can most easily be used with a <a href="https://developers.google.com/places/web-service/autocomplete">Google Maps</a> integration to help your users locate their addresses or other points of interest. For an example, click on the working example below.</p>
 
 <h3 id="http-request">HTTP Request</h3>
 
@@ -972,11 +990,6 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
 <td>string - required - submitted as a part of the endpoint path, not as a separate URL parameter</td>
 </tr>
 <tr>
-<td>location[query]</td>
-<td>null</td>
-<td>string - optional - MARIO TODO</td>
-</tr>
-<tr>
 <td>location[latitude]</td>
 <td>null</td>
 <td>float - required - a float representing the queried latitude</td>
@@ -985,6 +998,16 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
 <td>location[longitude]</td>
 <td>null</td>
 <td>float - required - a float representing the queried longitude</td>
+</tr>
+<tr>
+<td>location[country]</td>
+<td>null</td>
+<td>string - optional - for efforts that use the &ldquo;by country&rdquo; search strategy, you can pass in the target country here.</td>
+</tr>
+<tr>
+<td>location[region]</td>
+<td>null</td>
+<td>string - optional - for efforts that use the &ldquo;by state&rdquo; search strategy, you can pass in the target state here.</td>
 </tr>
 </tbody></table>
 
@@ -997,7 +1020,10 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
   data-title="ControlShift Labs: List of Petitions in an Effort Example">
   <div class="codepen-html">
     <h1>Find the closest petitions to you</h1>
-    <form><input type="text" class="form-control" id="effort-lookup-input" placeholder="Enter your address or a nearby landmark"></form>
+    <form>
+      <input type="text" class="form-control" id="effort-lookup-input" placeholder="Enter your address or a nearby landmark">
+      <small>Note: The above text field is auto-completed using the Google Maps <a href="https://developers.google.com/places/web-service/autocomplete" target="_blank">Autocomplete API</a></small>
+    </form>
     <div id="petitions">
     </div>
   </div>
@@ -1022,7 +1048,6 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
         url: 'https://demo.controlshiftlabs.com/efforts/forecast-the-facts/near.json',
         dataType: 'jsonp',
         data: {
-          'location[query]': place.formatted_address,
           'location[latitude]': place.geometry.location.lat(),
           'location[longitude]': place.geometry.location.lng()
         }
@@ -1214,23 +1239,23 @@ You must whitelist your hostname prior to using this end point. Read more below.
 
 <h3 id="whitelisting-a-hostname">Whitelisting a Hostname</h3>
 
-<p>We authenticate requests to the current user endpoint by validating the hostname set in the http referer header against a whitelist. The whitelist is set of hostnames that scripts can be served from. If you request the endpoint from a script served from a non-whitelisted hostname you&rsquo;ll get an error message. This is necessary to prevent cross site scripting attacks that would allow someone to display logged in user information on unauthorized sites.</p>
+<p>We authenticate requests to the current user endpoint by validating the hostname set in the HTTP referrer header against a whitelist. The whitelist is set of hostnames that scripts can be served from. If you request the endpoint from a script served from a non-whitelisted hostname you&rsquo;ll get an error message. This is necessary to prevent cross site scripting attacks that would allow someone to display logged in user information on unauthorized sites.</p>
 
 <p>You can add hostnames to the whitelist through a self-serve interface in the &ldquo;Settings&rdquo; area of your instance. Settings &gt; Add Hostname &gt; enter a Hostname, and click save.</p>
 
-<p>The hostname must be a hostname string like &ldquo;localhost&rdquo; &ldquo;www.google.com&rdquo; or the like. Wildcards or full http urls are not supported.</p>
+<p>The hostname must be a hostname string like &ldquo;localhost&rdquo; &ldquo;www.google.com&rdquo; or the like. Wildcards or full HTTP URLs are not supported.</p>
 
-<p>When you access the graph api endpoint from a page served from a whitelisted hostname the browser will automatically set a referrer header on those requests. We use this referrer header to validate the server the script was served from against the whitelist. You can verify that a whitelisted hostname is working properly with the curl command line tool:</p>
+<p>When you access the graph API endpoint from a page served from a whitelisted hostname the browser will automatically set a referrer header on those requests. We use this referrer header to validate the server the script was served from against the whitelist. You can verify that a whitelisted hostname is working properly with the curl command line tool:</p>
 
 <p><code class="prettyprint">curl --referer http://localhost/ http://demo.controlshiftlabs.com/api/graph/me.json</code></p>
 
-<p>The above should return a json blob indicating that the user is not signed in if localhost is whitelisted. Otherwise you&rsquo;ll get a not whitelisted error.</p>
+<p>The above should return a JSON blob indicating that the user is not signed in if localhost is whitelisted. Otherwise you&rsquo;ll get a not whitelisted error.</p>
 
 <p>For authenticated users we currently return their first and last names, email addresses, and lists of petitions they&rsquo;ve created, events they&rsquo;ve created and local groups they are a member of.</p>
 
           <h1 id="webhook-endpoints">Webhook Endpoints</h1>
 
-<p>Webhooks can be used by software engineers to integrate ControlShift with third-party systems. They allow engineers to build software that is triggered by events that take place within ControlShift. Controlshift would execute HTTP calls when certain event happen (e.g. a petition is launched; a category is changed).</p>
+<p>Webhooks can be used by software engineers to integrate ControlShift with third-party systems. They allow engineers to build software that is triggered by events that take place within ControlShift. ControlShift would execute HTTP calls when certain event happen (e.g. a petition is launched; a category is changed).</p>
 
 <p>To begin using these new webhooks, go to the admin homepage and click &ldquo;Settings&rdquo; under &ldquo;Manage.&rdquo; Then choose the &ldquo;CRM Integration &amp; Webhooks&rdquo; tab and click &ldquo;Configure Webhook Endpoints.&rdquo; To begin sending data, you&rsquo;ll need to add a &ldquo;New Webhook Endpoint.&rdquo; Each Webhook Endpoint URL receives a full firehose of all hooks that occur within ControlShift.</p>
 
@@ -1238,9 +1263,13 @@ You must whitelist your hostname prior to using this end point. Read more below.
 
 <p>If you need additional information about webhooks or how to use them, please send us a support email <a href="mailto:support@controlshiftlabs.com">support@controlshiftlabs.com</a>. We&rsquo;d also love stories about how customers are using webhooks.</p>
 
-<h2 id="webhooks-event-summary">Webhooks event summary</h2>
+<h3 id="identifying-unique-webhook-events">Identifying Unique Webhook Events</h3>
 
-<p>The ControlShift Labs Webhooks can be configured to support the following events:</p>
+<p>In the extermely unlikely event that a webhook is double set for some reason (error on our end, Internet gremlins, etc.), you can always identify webhooks by their unique <code class="prettyprint">jid</code> (job id). If an incoming webhook has the same <code class="prettyprint">jid</code> as a webhook that has already been processed, you can safely ignore the new one.</p>
+
+<h2 id="webhook-types-summary">Webhook types summary</h2>
+
+<p>You can configure ControlShift Labs Webhooks to return the following event types:</p>
 
 <table><thead>
 <tr>
@@ -1309,6 +1338,10 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <td>A petition passes the post-launch spam check</td>
 </tr>
 <tr>
+<td><a href="#petition-launched-requires_moderation">petition.launched.requires_moderation</a></td>
+<td>A new petition requires moderation</td>
+</tr>
+<tr>
 <td><a href="#petition-reactivated">petition.reactivated</a></td>
 <td>A hidden or ended petition is reactivated</td>
 </tr>
@@ -1317,8 +1350,8 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <td>A petition is updated</td>
 </tr>
 <tr>
-<td><a href="#petition-edited">petition.edited</a></td>
-<td>A petition&rsquo;s content is edited</td>
+<td><a href="#petition-updated-requires_moderation">petition.updated.requires_moderation</a></td>
+<td>An updated petition requires moderation</td>
 </tr>
 <tr>
 <td><a href="#signature-created">signature.created</a></td>
@@ -1341,7 +1374,7 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <h2 id="blast_email-created">blast_email.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">blast_email.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"blast_email.created"</span><span class="p">,</span><span class="w">
@@ -1361,7 +1394,7 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <h2 id="category-created">category.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">category.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"category.created"</span><span class="p">,</span><span class="w">
@@ -1382,7 +1415,7 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <h2 id="category-updated">category.updated</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">category.updated</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"category.updated"</span><span class="p">,</span><span class="w">
@@ -1403,53 +1436,41 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <h2 id="data-full_table_exported">data.full_table_exported</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">data.full_table_exported</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"data.full_table_exported"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://agra-data-exports.s3.amazonaws.com/default/petitions_20150803180434.csv?AWSAccessKeyId=XXX&amp;amp;Expires=1438711490&amp;amp;Signature=ABCDE%3D"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://agra-data-exports.s3.amazonaws.com/default/petitions_20150803180434.csv?AWSAccessKeyId=XXX&amp;Expires=1438711490&amp;Signature=ABCDE%3D"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"table"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petitions"</span><span class="w">
   </span><span class="p">},</span><span class="w">
   </span><span class="nt">"jid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cf0f50d7d225e20a188be328"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-
 </span></code></pre>
 
-<p>A full-table dump is ready for retrieval at S3.</p>
-
-<aside class="notice">
-URL is encoded using (7-bit) ASCII and some characters will be escaped (i.e.: &rsquo;&amp;&rsquo;, &rsquo;&lt;&rsquo;, &rsquo;&gt;&rsquo;, etc.). See <a target="blank" href="http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding">
-http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a> for more details.
-</aside>
+<p>A full-table dump is ready for retrieval at S3</p>
 
 <h2 id="data-incremental_table_exported">data.incremental_table_exported</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">data.incremental_table_exported</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"data.incremental_table_exported"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://agra-data-exports.s3.amazonaws.com/default/petitions_20150803180434.csv?AWSAccessKeyId=XXX&amp;amp;Expires=1438711490&amp;amp;Signature=ABCDE%3D"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://agra-data-exports.s3.amazonaws.com/default/petitions_20150803180434.csv?AWSAccessKeyId=XXX&amp;Expires=1438711490&amp;Signature=ABCDE%3D"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"table"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petitions"</span><span class="w">
   </span><span class="p">},</span><span class="w">
   </span><span class="nt">"jid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cf0f50d7d225e20a188be328"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-
 </span></code></pre>
 
 <p>An incremental CSV update is ready for retrieval at S3</p>
 
-<aside class="notice">
-URL is encoded using (7-bit) ASCII and some characters will be escaped (i.e.: &rsquo;&amp;&rsquo;, &rsquo;&lt;&rsquo;, &rsquo;&gt;&rsquo;, etc.). See <a target="blank" href="http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding">
-http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a> for more details.
-</aside>
-
 <h2 id="event-created">event.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">event.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"event.created"</span><span class="p">,</span><span class="w">
@@ -1467,7 +1488,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="event-updated">event.updated</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">event.updated</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"event.updated"</span><span class="p">,</span><span class="w">
@@ -1485,7 +1506,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="flag-created">flag.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">flag.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flag.created"</span><span class="p">,</span><span class="w">
@@ -1508,12 +1529,12 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>Someone flags a problem for admin attention. For example, a local chapter organiser flags a forum message.</p>
+<p>Someone flags a problem for admin attention</p>
 
 <h2 id="local_chapter-last_organiser-deleted">local_chapter.last_organiser.deleted</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">local_chapter.last_organiser.deleted</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"local_chapter.last_organiser.deleted"</span><span class="p">,</span><span class="w">
@@ -1531,7 +1552,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="local_chapter-organiser_request-created">local_chapter.organiser_request.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">local_chapter.organiser_request.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"local_chapter.organiser_request.created"</span><span class="p">,</span><span class="w">
@@ -1558,7 +1579,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="member-deleted-resources_transferred">member.deleted.resources_transferred</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">member.deleted.resources_transferred</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"member.deleted.resources_transferred"</span><span class="p">,</span><span class="w">
@@ -1583,7 +1604,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="petition-flagged">petition.flagged</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.flagged</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.flagged"</span><span class="p">,</span><span class="w">
@@ -1628,7 +1649,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="petition-inappropriate-creator_message">petition.inappropriate.creator_message</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.inappropriate.creator_message</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.inappropriate.creator_message"</span><span class="p">,</span><span class="w">
@@ -1673,7 +1694,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="petition-launched">petition.launched</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.launched</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.launched"</span><span class="p">,</span><span class="w">
@@ -1718,7 +1739,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="petition-launched-ham">petition.launched.ham</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.launched.ham</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.launched.ham"</span><span class="p">,</span><span class="w">
@@ -1760,10 +1781,55 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 
 <p>A petition passes the post-launch spam check</p>
 
+<h2 id="petition-launched-requires_moderation">petition.launched.requires_moderation</h2>
+
+<blockquote>
+<p>Example payload for <code class="prettyprint">petition.launched.requires_moderation</code>:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.launched.requires_moderation"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"slug"</span><span class="p">:</span><span class="w"> </span><span class="s2">"don-t-destroy-our-park"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Don't destroy our park!"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://demo.controlshiftlabs.com/petitions/don-t-destroy-our-park"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://d34smfggpfnvat.cloudfront.net/petitions/images/788/hero/imag0945.jpg?1438621934"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"additional_image_sizes_url"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"style"</span><span class="p">:</span><span class="w"> </span><span class="s2">"form"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://d34smfggpfnvat.cloudfront.net/petitions/images/788/form/imag0945.jpg?1438621934"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"style"</span><span class="p">:</span><span class="w"> </span><span class="s2">"large"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://d34smfggpfnvat.cloudfront.net/petitions/images/788/large/imag0945.jpg?1438621934"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"style"</span><span class="p">:</span><span class="w"> </span><span class="s2">"open_graph"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://d34smfggpfnvat.cloudfront.net/petitions/images/788/open_graph/imag0945.jpg?1438621934"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"style"</span><span class="p">:</span><span class="w"> </span><span class="s2">"original"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://d34smfggpfnvat.cloudfront.net/petitions/images/788/original/imag0945.jpg?1438621934"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nt">"who"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Anytown City Council"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"jid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9fccc1957d7d7ebc93fb0f05"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>A new petition requires moderation</p>
+
 <h2 id="petition-reactivated">petition.reactivated</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.reactivated</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.reactivated"</span><span class="p">,</span><span class="w">
@@ -1808,7 +1874,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="petition-updated">petition.updated</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.updated</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.updated"</span><span class="p">,</span><span class="w">
@@ -1850,13 +1916,13 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 
 <p>A petition is updated</p>
 
-<h2 id="petition-edited">petition.edited</h2>
+<h2 id="petition-updated-requires_moderation">petition.updated.requires_moderation</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">petition.updated.requires_moderation</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.edited"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"petition.updated.requires_moderation"</span><span class="p">,</span><span class="w">
   </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nt">"slug"</span><span class="p">:</span><span class="w"> </span><span class="s2">"don-t-destroy-our-park"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Don't destroy our park!"</span><span class="p">,</span><span class="w">
@@ -1893,12 +1959,12 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<p>A petition&rsquo;s content is edited</p>
+<p>An updated petition requires moderation</p>
 
 <h2 id="signature-created">signature.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">signature.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"signature.created"</span><span class="p">,</span><span class="w">
@@ -1922,7 +1988,8 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
     </span><span class="nt">"from_embed"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
     </span><span class="nt">"confirmed_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
     </span><span class="nt">"last_signed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"additional_fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+    </span><span class="nt">"additional_fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"member"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">747</span><span class="p">,</span><span class="w">
       </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="w">
@@ -1938,16 +2005,12 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 
-<blockquote>
-<p>We also include optional partnership or effort slugs nested under the petition resource for signatures that take place on petitions associated with those objects.</p>
-</blockquote>
-
 <p>Member signs a petition</p>
 
 <h2 id="unsubscribe-created">unsubscribe.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">unsubscribe.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unsubscribe.created"</span><span class="p">,</span><span class="w">
@@ -1967,7 +2030,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="locale-created">locale.created</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">locale.created</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"locale.created"</span><span class="p">,</span><span class="w">
@@ -1987,7 +2050,7 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 <h2 id="forum-message-requires_moderation">forum.message.requires_moderation</h2>
 
 <blockquote>
-<p>Here&rsquo;s what the payload looks like:</p>
+<p>Example payload for <code class="prettyprint">forum.message.requires_moderation</code>:</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
   </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"forum.message.requires_moderation"</span><span class="p">,</span><span class="w">
@@ -2011,27 +2074,6 @@ http://www.rubydoc.info/gems/activesupport/3.2.22/ActiveSupport/JSON/Encoding</a
 </span></code></pre>
 
 <p>A new message requires moderation</p>
-
-<p>The <strong>admin_status</strong> field can take any of the following values:
-<ul>
-  <li><em>unreviewed</em></li>
-  <li><em>flagged</em></li>
-  <li><em>approved_automatically</em></li>
-  <li><em>approved_manually</em></li>
-  <li><em>flagged_deleted</em></li>
-  <li><em>inappropriate</em></li>
-</ul></p>
-
-<p>Though on the <em>forum.message.requires_moderation</em> notification type it will always be set to <em>unreviewed</em></p>
-
-<p>The <strong>discussable.discussable_type</strong> field can take any of the following values:
-<ul>
-  <li><em>LocalChapter</em></li>
-  <li><em>Event</em></li>
-  <li><em>CalendarEvent</em></li>
-  <li><em>LocalChapterEvent</em></li>
-  <li><em>PetitionEvent</em></li>
-</ul></p>
 
 <h1 id="bulk-data-webhooks">Bulk Data Webhooks</h1>
 
