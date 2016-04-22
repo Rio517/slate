@@ -122,24 +122,6 @@
 
 <p>Welcome to the <a href="http://www.controlshiftlabs.com/">ControlShift Labs</a> JSON API and Webhook Endpoint documentation!  Our API and Webhooks are designed to allow software engineers to create rich integrations between ControlShift content and third-party services and websites.</p>
 
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>&lt;% data.webhooks.each do</td>
-<td>webhook</td>
-</tr>
-<tr>
-<td><a href="#&lt;%= webhook.webhook %">&lt;%= webhook.webhook %&gt;</a></td>
-<td>&lt;%= webhook.description %&gt;</td>
-</tr>
-</tbody></table>
-
-<p>&lt;% end %&gt;</p>
-
           <h1 id="json-api-endpoints">JSON API Endpoints</h1>
 
 <p>The JSONP API is a simple way to embed ControlShift petition content in external sites. It&rsquo;s intended for use by a front-end developer embed content on web pages outside of the platform.  For example, a developer could:</p>
@@ -1002,12 +984,12 @@ These examples use the domain <code>demo.controlshiftlabs.com</code>. You&rsquo;
 <tr>
 <td>location[country]</td>
 <td>null</td>
-<td>string - optional - for efforts that use the &ldquo;by country&rdquo; search strategy, you can pass in the target country here.</td>
+<td>string - optional - for efforts configured to use the &ldquo;by country&rdquo; search strategy, you can pass in the target country as a two letter <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements">ISO 3166-1</a> code.</td>
 </tr>
 <tr>
 <td>location[region]</td>
 <td>null</td>
-<td>string - optional - for efforts that use the &ldquo;by state&rdquo; search strategy, you can pass in the target state here.</td>
+<td>string - optional - for efforts configured to use the &ldquo;by state&rdquo; search strategy, you can pass in the target state as a two letter state abbreviation.</td>
 </tr>
 </tbody></table>
 
@@ -1318,6 +1300,10 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <td>A user applies to be a local chapter organiser</td>
 </tr>
 <tr>
+<td><a href="#member-deleted">member.deleted</a></td>
+<td>A member is deleted</td>
+</tr>
+<tr>
 <td><a href="#member-deleted-resources_transferred">member.deleted.resources_transferred</a></td>
 <td>Resources previously owned by a deleted member have been transferred to another</td>
 </tr>
@@ -1356,6 +1342,10 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <tr>
 <td><a href="#signature-created">signature.created</a></td>
 <td>Member signs a petition</td>
+</tr>
+<tr>
+<td><a href="#signature-deleted">signature.deleted</a></td>
+<td>Signature permanently deleted. Signature deletions are distinct from unsubscribes and should be treated as if the signature never happened</td>
 </tr>
 <tr>
 <td><a href="#unsubscribe-created">unsubscribe.created</a></td>
@@ -1565,7 +1555,12 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="p">},</span><span class="w">
     </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">505</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jane@example.com"</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jane@example.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jane Goodall"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jane"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Goodall"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nt">"reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"I want to be part of this amazing group"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T12:38:46-04:00"</span><span class="w">
@@ -1575,6 +1570,36 @@ You must whitelist your hostname prior to using this end point. Read more below.
 </span></code></pre>
 
 <p>A user applies to be a local chapter organiser</p>
+
+<h2 id="member-deleted">member.deleted</h2>
+
+<blockquote>
+<p>Example payload for <code class="prettyprint">member.deleted</code>:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"member.deleted"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"member"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jane@example.com"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"resources"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"new_owner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">888</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"richard@example.com"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Richard Chamberlain"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Richard"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Chamberlain"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"jid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"030ee43a4fa9788e084d9cfc"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>A member is deleted</p>
 
 <h2 id="member-deleted-resources_transferred">member.deleted.resources_transferred</h2>
 
@@ -1591,7 +1616,12 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"resources"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nt">"new_owner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">888</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"richard@example.com"</span><span class="w">
+        </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"richard@example.com"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Richard Chamberlain"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Richard"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Chamberlain"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+        </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
       </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">},</span><span class="w">
@@ -1635,7 +1665,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1680,7 +1718,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1725,7 +1771,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1770,7 +1824,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1815,7 +1877,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1860,7 +1930,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1905,7 +1983,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -1950,7 +2036,15 @@ You must whitelist your hostname prior to using this end point. Read more below.
     </span><span class="nt">"what"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The park on Main Street is an important community space.  Don't approve the proposal to sell it to office building developers."</span><span class="p">,</span><span class="w">
     </span><span class="nt">"goal"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">
     </span><span class="nt">"signature_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"creator_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"creator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agra.user.adm@gmail.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"full_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tyshawn"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Morissette"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12345-1"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"34058-2356"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
     </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:11:02-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:12:15-04:00"</span><span class="p">,</span><span class="w">
     </span><span class="nt">"why"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Studies have shown that green space is important to child development and community well-being."</span><span class="w">
@@ -2006,6 +2100,52 @@ You must whitelist your hostname prior to using this end point. Read more below.
 </span></code></pre>
 
 <p>Member signs a petition</p>
+
+<h2 id="signature-deleted">signature.deleted</h2>
+
+<blockquote>
+<p>Example payload for <code class="prettyprint">signature.deleted</code>:</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"signature.created"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">645</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jennifer"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Goines"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jenny@example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"phone_number"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"postcode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"23456"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"country"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"join_organisation"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"join_group"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"locale"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2919ec5f25d493c19690a21135d7fd902a336927"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"source"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"bucket"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"user_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"127.0.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"user_agent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 Chrome/43.0.2357.130 Safari/537.36"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"daisy_chain_used"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"from_embed"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"confirmed_at"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"last_signed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"additional_fields"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"member"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">747</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"petition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost/petitions/don-t-destroy-our-park"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"slug"</span><span class="p">:</span><span class="w"> </span><span class="s2">"don-t-destroy-our-park"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-08-03T13:30:01-04:00"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"jid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1ebf2eb10c3d8939f42dff68"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Signature permanently deleted. Signature deletions are distinct from unsubscribes and should be treated as if the signature never happened</p>
 
 <h2 id="unsubscribe-created">unsubscribe.created</h2>
 
@@ -2075,65 +2215,344 @@ You must whitelist your hostname prior to using this end point. Read more below.
 
 <p>A new message requires moderation</p>
 
-<h1 id="bulk-data-webhooks">Bulk Data Webhooks</h1>
+          <h1 id="bulk-data">Bulk Data</h1>
 
-<p>We&rsquo;ve included two special sorts of bulk data webhooks that are designed to help you keep an external reporting or analytics database server up to date with information from ControlShift&rsquo;s internal tables. The <a href="#data-full_table_exported">data.full_table_exported</a> and <a href="#data-incremental_table_exported">data.incremental_table_exported</a> webhooks can be consumed to keep an external database mirror containing ControlShift data up to date. This service was built in a database agnostic way, but it should be possible to build a ControlShift -&gt; Amazon Redshift data pipeline using a technique like <a href="https://blogs.aws.amazon.com/bigdata/post/Tx24VJ6XF1JVJAA/A-Zero-Administration-Amazon-Redshift-Database-Loader">this one</a>.</p>
+<p>ControlShift&rsquo;s Bulk Data Webhooks make it easy to pull your data into external services. \</p>
 
-          <h1 id="errors">Errors</h1>
+<h2 id="webhooks">Webhooks</h2>
 
-<p>The ControlShift Labs API uses the following error codes:</p>
+<p>We provides two special bulk data webhooks to help you keep an external reporting or analytics database server up to date with information from ControlShift&rsquo;s internal tables. The <a href="#data-full_table_exported">data.full_table_exported</a> and <a href="#data-incremental_table_exported">data.incremental_table_exported</a> webhooks can be consumed to keep an external database mirror containing ControlShift data up to date. This service was built in a database agnostic way, but it should be possible to build a ControlShift -&gt; Amazon Redshift data pipeline using the following technique.</p>
+
+<h2 id="controlshift-to-redshift-pipeline">ControlShift to Redshift Pipeline</h2>
+
+<p>Setting up an Amazon Redshit integration should take a little less than two hours. We&rsquo;ll use a custom <a href="http://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lamda</a> to receive data from ControlShift&rsquo;s webhook and Amazon&rsquo;s <a href="https://github.com/awslabs/aws-lambda-redshift-loader">Lamda Redshift Loader</a> to load our data into Redshift. For this example, we&rsquo;ll focus on the daily full_table dump, and truncating the previous days data. You could also add a second pipeline to add incremental data if you need more frequent updates.</p>
+
+<h3 id="example-flow">Example Flow</h3>
+
+<p>Pending&hellip;</p>
+
+<h3 id="redshift-pipline-setup">Redshift Pipline Setup</h3>
+
+<p>The core steps to get this up and running are:</p>
+
+<ol>
+<li>Setting up S3 buckets to retain file storage</li>
+<li>Setting up your Redshift database cluster and preloading a schema.</li>
+<li>Setting up your custom lambda webhook receiver</li>
+<li>Setting up your aws-lambda-redshift-loader.</li>
+<li>Configure your bulk data webhook in the Control Shift settings console.</li>
+</ol>
+
+<p><strong>Note:</strong> All resources should be set up in the same AWS region (ex: us-east-1) so they can access each other. &ldquo;US Standard&rdquo; and &ldquo;us-east-1&rdquo; are the same thing.</p>
+
+<p><strong>Before starting:</strong> You&rsquo;ll need git, npm, and access to a PostgreSQL connection tool(Redshift is based on PostgreSQL). These instructions use <code class="prettyprint">psql</code> on the command line.</p>
+
+<p>These instructions were prepared for aws-lambda-redshift-loader v2.4.0.</p>
+
+<hr>
+
+<h3 id="setting-up-s3-buckets">Setting Up S3 Buckets</h3>
+
+<ol>
+<li>Login to you AWS console and create two s3 buckets for future use.
+
+<ol>
+<li>controlshift-receiver - will hold received csv files</li>
+<li>controlshift-manifests - will hold resulting manifest files from your aws-lambda-redshift-loader</li>
+</ol></li>
+<li>That&rsquo;s it. You&rsquo;re done here.</li>
+</ol>
+
+<hr>
+
+<h3 id="setting-up-custom-lambda-receiver">Setting Up Custom Lambda Receiver</h3>
+
+<blockquote>
+<p>Lambda Receiver Code</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">https</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'https'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'url'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">AWS</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'aws-sdk'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">s3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">S3</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">targetBucket</span> <span class="o">=</span> <span class="s1">'controlshift-receiver'</span><span class="p">;</span> <span class="c1">// receiver bucket name</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">handler</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">receivedJSON</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Received event:'</span><span class="p">,</span> <span class="nx">receivedJSON</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">downloadUrl</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">url</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">fileName</span> <span class="o">=</span> <span class="nx">url</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">downloadUrl</span><span class="p">).</span><span class="nx">pathname</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span><span class="s1">''</span><span class="p">)</span>
+  <span class="nx">https</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">downloadUrl</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">httpResponse</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">upload_details</span> <span class="o">=</span> <span class="p">{</span><span class="na">Bucket</span><span class="p">:</span> <span class="nx">targetBucket</span><span class="p">,</span> <span class="na">Key</span><span class="p">:</span> <span class="nx">fileName</span><span class="p">,</span> <span class="na">Body</span><span class="p">:</span> <span class="nx">httpResponse</span><span class="p">};</span>
+    <span class="nx">s3</span><span class="p">.</span><span class="nx">upload</span><span class="p">(</span><span class="nx">upload_details</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span> <span class="c1">// an error occurred</span>
+        <span class="nx">context</span><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+      <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span> <span class="c1">// successful response</span>
+        <span class="nx">context</span><span class="p">.</span><span class="nx">succeed</span><span class="p">({</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"success"</span><span class="p">,</span> <span class="s2">"payload"</span><span class="p">:</span> <span class="nx">receivedJSON</span><span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>From the Lambda management console, you&rsquo;ll need to do the following.</p>
+
+<h4 id="create-the-receiver-lambda">Create the Receiver Lambda</h4>
+
+<ol>
+<li>Click to create a new Lambda function.</li>
+<li>Skip the existing blueprints (button towards  the bottom of page)</li>
+<li>Name your function something like &ldquo;controlShiftWebhookReciever&rdquo; and leave the runtime to node default.</li>
+<li>Copy and paste the &ldquo;Lambda Receiver&rdquo; function from the right into the inline lambda code editor.</li>
+<li>Leave the handler as the default.</li>
+<li>For role, select &ldquo;S3 Execution role&rdquo;. This will open a new window.</li>
+<li>In this new window, called &ldquo;IAM Management Console&rdquo;, name your role something relevant, like &ldquo;controlShiftReceriver_s3.&rdquo; Then click &ldquo;Allow&rdquo; in the far bottom left corner.</li>
+<li>Next is setting the memory size. You should be fine with 128MB, but you can always update the memory size later.</li>
+<li>Set the Timeout a little higher - 30 seconds should be fine.</li>
+<li>Use &ldquo;No VPC&rdquo;.</li>
+</ol>
+
+<h4 id="setup-the-api-endpoint">Setup the API Endpoint</h4>
+
+<p>Now that we have our Lambda setup, we need to be able to POST to it from your Control Shift instance.</p>
+
+<ol>
+<li>If not already there, go back to the Receiver Lambda we just created.</li>
+<li>Click on the &ldquo;API Endpoints&rdquo; tab and click to add a new endpoint.</li>
+<li>Select an API Gateway.</li>
+<li>Set the Method to POST and Security to Open.</li>
+<li>Click create. Done! (TODO: double check we don&rsquo;t need cors here. I cannot imagine how)</li>
+</ol>
+
+<hr>
+
+<h3 id="setting-up-redshift-database">Setting Up RedShift Database</h3>
+
+<p>Click on over to the Redshift service in the AWS console.</p>
+
+<h4 id="launch-your-cluster">Launch Your Cluster</h4>
+
+<ol>
+<li>Click to create your cluster.</li>
+<li>Setup a identifier, database name, master user name and password as you desire and click next. Let&rsquo;s use these values for this example:
+
+<ul>
+<li>Cluster: control-shift-cluster</li>
+<li>Database name: controlshiftdb</li>
+<li>Port: Leave the default</li>
+<li>Master Username: masteruser</li>
+</ul></li>
+<li>Use the defaults on the next two screens, &ldquo;Node Configuration&rdquo; and &ldquo;Additional Configuration, just click next.</li>
+<li>Then Launch!</li>
+<li>Once the creation and launch process finishes, you can click to view your new cluster&rsquo;s properties, which will include an  endpoint address. Save that address somewhere. Example: <code class="prettyprint">control-shift-cluster.xXxXxX00Xx.us-east-1.redshift.amazonaws.com</code></li>
+</ol>
+
+<h4 id="perpare-redshift-connection-security">Perpare Redshift Connection Security</h4>
+
+<p>We need to whitelist our IP address for our default security group in order to connect to our Redshift DB.</p>
+
+<ol>
+<li>First, find your <a href="http://whatismyipaddress.com/">IP address</a>.</li>
+<li>Go to the AWS Console &gt; VPC</li>
+<li>Click to &quot;Security Groups&rdquo; in the left hand menu.</li>
+<li>Click on the default Security Group, then &ldquo;Inbound Rules&rdquo; and click edit.</li>
+<li>Add a new rule for &ldquo;All Traffic,&rdquo; and in the Source field put your CIDR. Your CIDR will almost always be your id address followed by <code class="prettyprint">/32</code> or <code class="prettyprint">/64</code> for ipv6.  Example: <code class="prettyprint">123.123.123.123/32</code>. Save the new rule.</li>
+</ol>
+
+<p><strong>Note:</strong> If you&rsquo;re having trouble getting your own IP/CIDR setup, try either looking up your subnet mask and using <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#IPv4_CIDR_blocks">this table</a> or just use the global 0.0.0.0/0 - opening your cluster to the public Internet. The latter isn&rsquo;t recommended. If you do have to do this, make sure you remove the rule when you&rsquo;re done with the next step.</p>
+
+<h4 id="prepare-redshift-schema">Prepare Redshift Schema</h4>
+
+<p>We need to prep our tables data schema to receive our ConrtolShift Data.  We&rsquo;ll use <code class="prettyprint">psql</code> for this.</p>
+
+<ol>
+<li>Install <code class="prettyprint">psql</code> you don&rsquo;t have it already.</li>
+<li>Download the current schema for our petitions table as petitions.sql. (TODO: insert link)</li>
+<li>Finally, you&rsquo;ll need to load that schema into your table with the following command.</li>
+</ol>
+
+<p><code class="prettyprint">psql -h &lt;endpoint&gt; -U &lt;database_user&gt; -d &lt;database_name&gt; -p &lt;cluster_port&gt;</code></p>
+
+<p><strong>Note:</strong> You should almost immediately get a request for your password. If you&rsquo;re connection is timing out before you enter your password, there is a authorization issue.  If you are timing out after connecting, you can extend your keep alive timeout with the following shell command.</p>
+
+<p><code class="prettyprint">sudo /sbin/sysctl -w net.ipv4.tcp_keepalive_time=200 net.ipv4.tcp_keepalive_intvl=200 net.ipv4.tcp_keepalive_probes=5</code></p>
+
+<p><strong>Security Note:</strong> In an optimal scenario, one would also use psql to connect to your Redshift instance to <a href="http://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_USER.html">create a user</a> for our aws-lambda-redshift-loader to use. We&rsquo;ll skip this step for now. You can find more details in the aws-lamda-redshift-loader <a href="https://github.com/awslabs/aws-lambda-redshift-loader#database-permissions">readme</a>.</p>
+
+<hr>
+
+<h3 id="setting-up-aws-lambda-redshift-loader">Setting up aws-lambda-redshift-loader</h3>
+
+<h4 id="deploying-the-aws-lambda-redshift-loader-function">Deploying the aws-lambda-redshift-loader Function</h4>
+
+<blockquote>
+<p>AWS Lambda Execution Role</p>
+</blockquote>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1424787824000"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"dynamodb:DeleteItem"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:DescribeTable"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:GetItem"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:ListTables"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:PutItem"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:Query"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:Scan"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"dynamodb:UpdateItem"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:GetEndpointAttributes"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:GetSubscriptionAttributes"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:GetTopicAttributes"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:ListTopics"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:Publish"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:Subscribe"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"sns:Unsubscribe"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"s3:Get*"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"s3:Put*"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"s3:List*"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"kms:Decrypt"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"kms:DescribeKey"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"kms:GetKeyPolicy"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"*"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<ol>
+<li>Go to the AWS Lambda Console in the same region as your S3 bucket and Amazon Redshift cluster.</li>
+<li>Select Create a Lambda function and enter the name controlShiftRedshiftLoader (for example).</li>
+<li>Under Code entry type select &lsquo;Upload a zip file&rsquo; and upload the <a href="https://github.com/awslabs/aws-lambda-redshift-loader/blob/master/dist/AWSLambdaRedshiftLoader-2.4.0.zip">AWSLambdaRedshiftLoader-2.4.0.zip</a> from your local <code class="prettyprint">dist</code> folder or <a href="https://github.com/awslabs/aws-lambda-redshift-loader/tree/master/dist">download it</a>.</li>
+<li>Use the default values for the handler, and in the Role drop-down, select &ldquo;* Basic Execution Role.&rdquo; A IAM creation wizard will open in a new window.</li>
+<li>Follow the wizard, selecting to &ldquo;Create a new IAM Role&rdquo; and name it as you like.  Click to &ldquo;View the Policy&rdquo; and then click edit.</li>
+<li>Copy and paste the the AWS Lambda Execution Role permissions from the right here or from the official <a href="https://github.com/awslabs/aws-lambda-redshift-loader#getting-started---lambda-execution-role">readme</a>. </li>
+<li>Navigate back to your Lambda setup tab and set the max timeout (5 minutes) for the function to accommodate long COPY times.</li>
+<li>Click next and then create your Lambda.</li>
+</ol>
+
+<h4 id="establishing-an-event-source">Establishing an Event Source</h4>
+
+<p>Once deployed, you need to add an event source:</p>
+
+<ol>
+<li>Select &ldquo;Event Source&rdquo; tab and click to &ldquo;Add event source.&rdquo;</li>
+<li>The event source type should be set to S3.</li>
+<li>Select the S3 bucket you want to use for input data - controlshift-receiver.</li>
+<li>Select the &#39;Object Created (All)&rsquo; notification type.</li>
+</ol>
+
+<h4 id="configuration-prep">Configuration Prep</h4>
+
+<ol>
+<li>If you have already installed npm&rsquo;s <code class="prettyprint">aws-sdk</code> with your credentials, great, but if not, you can always export your credentials as environment variables before running <code class="prettyprint">setup node.js</code>.
+<code class="prettyprint">export AWS_ACCESS_KEY_ID=XXXXXXXXX AWS_SECRET_ACCESS_KEY=XXXXXXXXXXX</code></li>
+<li>You&rsquo;ll need to export your region as well <code class="prettyprint">export AWS_REGION=us-east-1</code>.</li>
+</ol>
+
+<h4 id="running-setup-js">Running setup.js</h4>
+
+<ol>
+<li>After setting up your environment, head to your local copy of aws-lambda-redshift-loader.</li>
+<li>run <code class="prettyprint">node setup.js</code></li>
+<li>The script will request various configuration options.  Some sensible responses for our use case are below. Empty responses were just skipped.</li>
+</ol>
 
 <table><thead>
 <tr>
-<th>Error Code</th>
-<th>Meaning</th>
+<th></th>
 </tr>
 </thead><tbody>
 <tr>
-<td>400</td>
-<td>Bad Request &ndash; Your request sucks</td>
+<td>Enter the Region for the Configuration &gt; us-east-1</td>
 </tr>
 <tr>
-<td>401</td>
-<td>Unauthorized &ndash; Your API key is wrong</td>
+<td>Enter the S3 Bucket &amp; Prefix to watch for files &gt; controlshift-receiver</td>
 </tr>
 <tr>
-<td>403</td>
-<td>Forbidden &ndash; The kitten requested is hidden for administrators only</td>
+<td>Enter a Filename Filter Regex &gt;</td>
 </tr>
 <tr>
-<td>404</td>
-<td>Not Found &ndash; The specified kitten could not be found</td>
+<td>Enter the Cluster Endpoint &gt; control-shift-cluster.xXxXxX00Xx.us-east-1.redshift.amazonaws.com</td>
 </tr>
 <tr>
-<td>405</td>
-<td>Method Not Allowed &ndash; You tried to access a kitten with an invalid method</td>
+<td>Enter the Cluster Port &gt; 5439</td>
 </tr>
 <tr>
-<td>406</td>
-<td>Not Acceptable &ndash; You requested a format that isn&rsquo;t json</td>
+<td>Does your cluster use SSL (Y/N)  &gt; Y</td>
 </tr>
 <tr>
-<td>410</td>
-<td>Gone &ndash; The kitten requested has been removed from our servers</td>
+<td>Enter the Database Name &gt; controlshiftdb</td>
 </tr>
 <tr>
-<td>418</td>
-<td>I&rsquo;m a teapot</td>
+<td>Enter the Table to be Loaded &gt; facts</td>
 </tr>
 <tr>
-<td>429</td>
-<td>Too Many Requests &ndash; You&rsquo;re requesting too many kittens! Slow down!</td>
+<td>Enter the comma-delimited column list (optional) &gt;</td>
 </tr>
 <tr>
-<td>500</td>
-<td>Internal Server Error &ndash; We had a problem with our server. Try again later.</td>
+<td>Should the Table be Truncated before Load? (Y/N) &gt; Y # Don&rsquo;t truncate if this lambda will handle incremental builds.</td>
 </tr>
 <tr>
-<td>503</td>
-<td>Service Unavailable &ndash; We&rsquo;re temporarially offline for maintanance. Please try again later.</td>
+<td>Enter the Database Username &gt; masteruser # Or any user you created in psql</td>
+</tr>
+<tr>
+<td>Enter the Database Password &gt; SuPeRs8CuR1tY # your password</td>
+</tr>
+<tr>
+<td>Enter the Data Format (CSV, JSON or AVRO) &gt; CSV</td>
+</tr>
+<tr>
+<td>Enter the CSV Delimiter &gt; ,</td>
+</tr>
+<tr>
+<td>Enter the S3 Bucket for Redshift COPY Manifests &gt; controlshift-manifests</td>
+</tr>
+<tr>
+<td>Enter the Prefix for Redshift COPY Manifests &gt; manifests</td>
+</tr>
+<tr>
+<td>Enter the Prefix to use for Failed Load Manifest Storage &gt; failed</td>
+</tr>
+<tr>
+<td>Enter the Access Key used by Redshift to get data from S3. If NULL then Lambda execution role credentials will be used &gt;</td>
+</tr>
+<tr>
+<td>Enter the Secret Key used by Redshift to get data from S3. If NULL then Lambda execution role credentials will be used &gt;</td>
+</tr>
+<tr>
+<td>Enter the SNS Topic ARN for Successful Loads &gt;</td>
+</tr>
+<tr>
+<td>Enter the SNS Topic ARN for Failed Loads &gt;</td>
+</tr>
+<tr>
+<td>How many files should be buffered before loading? &gt; 1</td>
+</tr>
+<tr>
+<td>How old should we allow a Batch to be before loading (seconds)? &gt; 120</td>
+</tr>
+<tr>
+<td>Additional Copy Options to be added &gt;</td>
+</tr>
+<tr>
+<td>If Encrypted Files are used, Enter the Symmetric Master Key Value &gt;</td>
 </tr>
 </tbody></table>
+
+<hr>
+
+<h3 id="configure-controlshift-39-s-webhook">Configure ControlShift&rsquo;s webhook</h3>
+
+<p>Finally, you&rsquo;ll need to log into your admin panel.  Settings &gt; CRM Integrations &amp; Webhooks &gt; Configure Webhook Endpoints.  Then add a bulk data webhook pointing at your Lambda endpoint.</p>
 
       </div>
       <div class="dark-box">
