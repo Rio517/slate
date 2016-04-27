@@ -2365,16 +2365,13 @@ You must whitelist your hostname prior to using this end point. Read more below.
 <li>Click on the default Security Group (it should say default in the &ldquo;Group Name&rdquo; column,</li>
 <li>Click on the &ldquo;Inbound Rules&rdquo; tab at the bottom and click edit.</li>
 <li>Click &ldquo;Add Rule.&rdquo;</li>
-<li>Select &ldquo;All Traffic&rdquo; for &ldquo;type&rdquo; and for &ldquo;source&rdquo; enter 0.0.0.0/0.  Save the new rule.</li>
+<li>Select &ldquo;All Traffic&rdquo; for &ldquo;type&rdquo; and for &ldquo;source&rdquo; select &ldquo;My IP.&rdquo; This should prefill your CIDR.  Save the new rule.</li>
+<li>Click &ldquo;Add Rule&rdquo; again.</li>
+<li>Select &ldquo;Redshift&rdquo; for &ldquo;Type.&rdquo; Enter your cluster&rsquo;s port (typically 5439). Type &ldquo;sg-&rdquo; into the source field, and it should pull up your default security group.</li>
 </ol>
 
-<!--
-We'd hate to leave this open, globally, but not sure how to setup permissions otherwise. Question is pending.  If we're unable to be more restrictive the directions above could be updated to go through the Console > VPC > Security rather than EC2.
-
-7. Select &ldquo;All Traffic&rdquo; for &ldquo;type&rdquo; and for &ldquo;source&rdquo; select &ldquo;My IP.&rdquo; This should prefill your CIDR.  Save the new rule.
-
-**Note:** If you&rsquo;re having trouble getting your own IP/CIDR setup, try either looking up your subnet mask and using [this table](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#IPv4_CIDR_blocks).  Your CIDR will almost always be your id address followed by `/32` or `/64` for ipv6.  Example: `123.123.123.123/32`. If all else fails, use the global 0.0.0.0/0 - opening your cluster to the public Internet. The latter isn&rsquo;t recommended. If you do have to do this, make sure you remove the rule when you&rsquo;re done.
- &ndash;>
+<p><strong>Note:</strong> If you&rsquo;re having trouble getting your own IP/CIDR setup, try either looking up your subnet mask and using <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#IPv4_CIDR_blocks">this table</a>.  Your CIDR will almost always be your id address followed by <code class="prettyprint">/32</code> or <code class="prettyprint">/64</code> for ipv6.  Example: <code class="prettyprint">123.123.123.123/32</code>. If all else fails, use the global 0.0.0.0/0 - opening your cluster to the public Internet. The latter isn&rsquo;t recommended. If you do have to do this, make sure you remove the rule when you&rsquo;re done.
+ &ndash;&gt;</p>
 
 <h4 id="prepare-redshift-schema">Prepare Redshift Schema</h4>
 
@@ -2424,12 +2421,12 @@ We'd hate to leave this open, globally, but not sure how to setup permissions ot
 <p>AWS Lambda Execution Role</p>
 </blockquote>
 <pre class="highlight json"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="nt">"Version"</span><span class="p">:</span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"Statement"</span><span class="p">:[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1424787824000"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="s2">"Stmt1424787824000"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Action"</span><span class="p">:[</span><span class="w">
         </span><span class="s2">"dynamodb:DeleteItem"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"dynamodb:DescribeTable"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"dynamodb:GetItem"</span><span class="p">,</span><span class="w">
@@ -2452,9 +2449,28 @@ We'd hate to leave this open, globally, but not sure how to setup permissions ot
         </span><span class="s2">"kms:DescribeKey"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"kms:GetKeyPolicy"</span><span class="w">
       </span><span class="p">],</span><span class="w">
-      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="nt">"Resource"</span><span class="p">:[</span><span class="w">
         </span><span class="s2">"*"</span><span class="w">
       </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Action"</span><span class="p">:[</span><span class="w">
+        </span><span class="s2">"logs:CreateLogGroup"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"logs:CreateLogStream"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"logs:PutLogEvents"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="s2">"arn:aws:logs:*:*:*"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+      </span><span class="nt">"Action"</span><span class="p">:[</span><span class="w">
+        </span><span class="s2">"ec2:CreateNetworkInterface"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"ec2:DescribeNetworkInterfaces"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"ec2:DetachNetworkInterface"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"ec2:DeleteNetworkInterface"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="s2">"*"</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
@@ -2467,8 +2483,11 @@ We'd hate to leave this open, globally, but not sure how to setup permissions ot
 <li>Use the default values for the handler, and in the Role drop-down, select &ldquo;* Basic Execution Role.&rdquo; A IAM creation wizard will open in a new window.</li>
 <li>Follow the wizard, selecting to &ldquo;Create a new IAM Role&rdquo; and name it as you like.  Click to &ldquo;View the Policy&rdquo; and then click edit.</li>
 <li>Copy and paste the the AWS Lambda Execution Role permissions from the example &ldquo;AWS Lambda Execution Role&rdquo; or from the official <a href="https://github.com/awslabs/aws-lambda-redshift-loader#getting-started---lambda-execution-role">readme</a>.</li>
+<li>Then click &ldquo;Add Policy.&rdquo; Select the <code class="prettyprint">AmazonRedshiftFullAccess</code> role and add it, then add another role - <code class="prettyprint">AmazonDMSRedshiftS3Role</code>.</li>
 <li>Navigate back to your Lambda setup tab and set the max timeout (5 minutes) to accommodate potentially long COPY times.</li>
-<li>Click next and then create your Lambda.</li>
+<li>From the VPC dropdown, select your default VPC.</li>
+<li>Leave the rest of the settings alone.</li>
+<li>Click next and then click to create your Lambda.</li>
 </ol>
 
 <h4 id="establishing-an-event-source">Establishing an Event Source</h4>
